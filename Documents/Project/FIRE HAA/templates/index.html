@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Detection System</title>
+    <style>
+        :root {
+            --primary: #dc2626;
+            --secondary: #1f2937;
+            --success: #059669;
+            --background: #f3f4f6;
+            --card: #ffffff;
+            --text: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Previous CSS remains the same */
+
+        /* New Notification Styles */
+        #notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Dynamic Background Animation */
+        @keyframes backgroundPulse {
+            0% { background-color: var(--background); }
+            50% { background-color: rgba(220, 38, 38, 0.1); }
+            100% { background-color: var(--background); }
+        }
+
+        body.alert {
+            animation: backgroundPulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="notifications"></div>
+
+    <!-- Previous HTML remains the same -->
+
+    <script>
+        let isDetecting = false;
+        const toggleButton = document.getElementById('toggleButton');
+        const videoFeed = document.getElementById('videoFeed');
+        const detectionStatus = document.getElementById('detectionStatus');
+        const lastDetection = document.getElementById('lastDetection');
+        const detectionHistory = document.getElementById('detectionHistory');
+        const notificationsContainer = document.getElementById('notifications');
+
+        function showNotification(message, type = 'alert') {
+            const notification = document.createElement('div');
+            notification.classList.add('notification', 'show');
+            notification.textContent = message;
+            
+            notificationsContainer.appendChild(notification);
+
+            // Automatically remove notification after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notificationsContainer.removeChild(notification);
+                }, 300);
+            }, 5000);
+
+            // Add dynamic background for alerts
+            if (type === 'alert') {
+                document.body.classList.add('alert');
+                setTimeout(() => {
+                    document.body.classList.remove('alert');
+                }, 5000);
+            }
+        }
+
+        toggleButton.addEventListener('click', async () => {
+            const endpoint = isDetecting ? '/stop_detection' : '/start_detection';
+            try {
+                const response = await fetch(endpoint, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    isDetecting = !isDetecting;
+                    updateUI();
+                    
+                    // Show notification
+                    showNotification(
+                        isDetecting 
+                            ? 'Fire detection system started. Monitoring in progress.' 
+                            : 'Fire detection system stopped.'
+                    );
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred while toggling detection.', 'error');
+            }
+        });
+
+        function updateUI() {
+            // Previous updateUI code remains the same
+        }
+
+        async function updateStatus() {
+            if (!isDetecting) return;
+
+            try {
+                const response = await fetch('/get_detection_status');
+                const data = await response.json();
+
+                lastDetection.textContent = data.last_detection || 'None';
+
+                if (data.detection_history && data.detection_history.length > 0) {
+                    detectionHistory.innerHTML = data.detection_history
+                        .map(detection => `
+                            <div class="detection-item">
+                                <span>${detection.timestamp}</span>
+                                <span class="confidence">${(parseFloat(detection.confidence) * 100).toFixed(1)}% confidence</span>
+                            </div>
+                        `)
+                        .join('');
+
+                    // Show notification for new detections
+                    data.detection_history.forEach(detection => {
+                        showNotification(
+                            `Fire detected! Confidence: ${(parseFloat(detection.confidence) * 100).toFixed(1)}%`, 
+                            'alert'
+                        );
+                    });
+                } else {
+                    detectionHistory.innerHTML = '<div class="detection-item">No detections yet</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching status:', error);
+                showNotification('Unable to fetch detection status.', 'error');
+            }
+        }
+
+        // Update status every second
+        setInterval(updateStatus, 1000);
+    </script>
+</body>
+</html>
