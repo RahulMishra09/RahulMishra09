@@ -13,6 +13,13 @@ React.js, Node.js, PyTorch, IoT systems, and implementing AI models for real-wor
 
 ---
 
+# 📊 GitHub Stats:
+![](https://github-readme-stats.vercel.app/api?username=RahulMishra09&theme=dark&hide_border=false&include_all_commits=true&count_private=true)  
+![](https://nirzak-streak-stats.vercel.app/?user=RahulMishra09&theme=dark&hide_border=false)  
+![](https://github-readme-stats.vercel.app/api/top-langs/?username=RahulMishra09&theme=dark&hide_border=false&layout=compact)
+
+---
+
 # 💻 Tech Stack
 
 ### **Programming Languages**
@@ -91,10 +98,4 @@ React.js, Node.js, PyTorch, IoT systems, and implementing AI models for real-wor
 ![Portfolio](https://img.shields.io/badge/Portfolio-%23000000.svg?style=for-the-badge&logo=firefox&logoColor=#FF7139)
 
 
----
-
-# 📊 GitHub Stats:
-![](https://github-readme-stats.vercel.app/api?username=RahulMishra09&theme=dark&hide_border=false&include_all_commits=true&count_private=true)  
-![](https://nirzak-streak-stats.vercel.app/?user=RahulMishra09&theme=dark&hide_border=false)  
-![](https://github-readme-stats.vercel.app/api/top-langs/?username=RahulMishra09&theme=dark&hide_border=false&layout=compact)
 
